@@ -3,15 +3,16 @@ import React, { useState, useEffect } from 'react';
 function App() {
     const [sslData, setSSLData] = useState(null);
     const [formData, setFormData] = useState(null);
-    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [radioInputs, setRadioInputs] = useState(false);
     const [cloudflareCaptchaFound, setCloudflareCaptchaFound] = useState(false);
+    const [totalCertified, setTotalCertified] = useState(false);
 
     // Fetch SSL data and form data from the content script
     useEffect(() => {
         // Listen for messages from the content script
         chrome.runtime.onMessage.addListener((message) => {
             if (message.success && message.action === 'scrapePage') {
-                setFormData(message.pageContent);   
+                setFormData(message);   
                 
                 // Check if "I accept the terms and conditions" is present in the scraped content
                 const termsFound = message.termFound;
@@ -35,24 +36,30 @@ function App() {
                 {
                     target: { tabId: tabs[0].id },
                     func: () => {
-                        const pageContent = document.body.innerText || document.body.textContent;
-                        const termsFound = pageContent.includes("I accept the");
+                        const radioInputs = Array.from(document.querySelectorAll('input[type="radio"]'));
+const lastRadioInput = radioInputs[radioInputs.length - 1];
+
+                const isLastRadioChecked = lastRadioInput ? true : false;
                         
                         // Check for iframes that may contain Cloudflare CAPTCHA
-                        const cloudflareCaptchaFound = Array.from(document.querySelectorAll('iframe')).some(iframe => {
-                            const src = iframe.src || '';
-                            return src.includes('cloudflare') || src.includes('captcha'); // Adjust as necessary
+                        const cloudflareCaptchaFound = Array.from(document.querySelectorAll('iframe'))
+                        const isCloudflareCaptcha = cloudflareCaptchaFound ? true : false;
+                        const totalPriceElement = Array.from(document.querySelectorAll('*')).find(el => {
+                            const style = window.getComputedStyle(el);
+                            return style.fontWeight === 'bold' && (el.innerText.toLowerCase().includes('total') || el.innerText.toLowerCase().includes('montant'));
                         });
-                        
-                        return { pageContent, termsFound, cloudflareCaptchaFound };
+                        const totalPrice = totalPriceElement ? true : false;
+                        return {  isLastRadioChecked, isCloudflareCaptcha, totalPrice };
                     },
                 },
                 (results) => {
                     if (results && results[0] && results[0].result) {
-                        const { pageContent, termsFound, cloudflareCaptchaFound } = results[0].result;
-                        setFormData(pageContent);
-                        setTermsAccepted(termsFound);
-                        setCloudflareCaptchaFound(cloudflareCaptchaFound);
+                        const { isLastRadioChecked, isCloudflareCaptcha , totalPrice } = results[0].result;
+                        console.log('Radio Data:',  isLastRadioChecked);
+                        setRadioInputs( isLastRadioChecked);
+                        console.log('radios:',  isLastRadioChecked);
+                        setCloudflareCaptchaFound(isCloudflareCaptcha);
+                        setTotalCertified(totalPrice);
                     }
                 }
             );
@@ -68,18 +75,21 @@ function App() {
                 <div className="mb-6 p-6 border rounded-lg shadow-lg bg-white">
                     <h2 className="text-2xl font-semibold mb-4 text-indigo-600">SSL Information</h2>
                     <p className="mb-2"><span className="font-bold">Host:</span> {sslData.host}</p>
-                    <p className="mb-2"><span className="font-bold">Status:</span> {sslData.status}</p>
-                    <p className="mb-2"><span className="font-bold">Grade:</span> {sslData.endpoints[0].grade}</p>
-                </div>
+                    <p className="mb-2"><span className="font-bold">Grade:</span> {sslData.endpoints[0].grade}  <span className={sslData.endpoints[0].grade === "A" || sslData.endpoints[0].grade === "A+" ? "font-bold" : "font-bold text-red-500"}>
+                    {sslData.endpoints[0].grade === "A" || sslData.endpoints[0].grade === "A+" ? ": 'Certified' " : ": 'Not Certified' "}
+                     </span></p>                </div>
             ) : (
                 <p className="text-center text-lg text-gray-500">Loading SSL data...</p>
             )}
 
     {/* Terms and Conditions */}
-    <p className="mb-4">Condition accepted: {termsAccepted ? 'true' : 'false'}</p>
+    <p className="mb-4">Condition accepted: {radioInputs ? 'true' : 'false'}</p>
 
     {/* Cloudflare CAPTCHA Check */}
     <p className="mb-4">Cloudflare CAPTCHA iframe found: {cloudflareCaptchaFound ? 'true' : 'false'}</p>
+
+    {/* Total Price */}
+    <p className="mb-4">Total Price Certified : {totalCertified ? 'True' : 'False'}</p>
 
     {/* Page Content */}
     {formData ? (
