@@ -36,7 +36,7 @@ function App() {
                     target: { tabId: tabs[0].id },
                     func: () => {
                         const pageContent = document.body.innerText || document.body.textContent;
-                        const termsFound = pageContent.includes("I accept the terms and conditions");
+                        const termsFound = pageContent.includes("I accept the");
                         
                         // Check for iframes that may contain Cloudflare CAPTCHA
                         const cloudflareCaptchaFound = Array.from(document.querySelectorAll('iframe')).some(iframe => {
