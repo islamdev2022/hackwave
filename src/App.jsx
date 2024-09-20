@@ -5,6 +5,7 @@ function App() {
     const [formData, setFormData] = useState(null);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [cloudflareCaptchaFound, setCloudflareCaptchaFound] = useState(false);
+    const [hasCaptcha, setHasCaptcha] = useState(null);
 
     // Fetch SSL data and form data from the content script
     useEffect(() => {
@@ -16,16 +17,31 @@ function App() {
                 // Check if "I accept the terms and conditions" is present in the scraped content
                 const termsFound = message.termFound;
                 setTermsAccepted(termsFound);
+        const messageListener = (message) => {
+            console.log("Received message:", message); // Debug log
+            if (message.action === 'scrapeData') {
+                setFormData(message.data);
+            } else if (message.action === 'captchaDetected') {
+                setHasCaptcha(message.data);
+                console.log("CAPTCHA detected:", message.data); // Debug log
             }
-        });
+        };
+
+        // Listen for messages from the content script
+        chrome.runtime.onMessage.addListener(messageListener);
 
         // Get the current tab's URL for SSL data
+        // Get the current tab's URL and inject content script
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const currentUrl = tabs[0].url;
             const sslCheckUrl = `https://api.ssllabs.com/api/v3/analyze?host=${new URL(currentUrl).hostname}`;
+            
             fetch(sslCheckUrl)
                 .then((response) => response.json())
-                .then((data) => setSSLData(data))
+                .then((data) => {
+                    console.log("SSL data:", data); // Debug log
+                    setSSLData(data);
+                })
                 .catch((error) => console.error('Error fetching SSL data:', error));
         });
 
@@ -57,22 +73,37 @@ function App() {
                 }
             );
         });
+
+            // Trigger content script to check for CAPTCHA
+            chrome.scripting.executeScript({
+                target: { tabId: tabs[0].id },
+                files: ['contentScript.js'],
+            }, () => {
+                console.log("Content script executed."); // Debug log
+            });
+        });
+
+        // Clean up the message listener
+        return () => {
+            chrome.runtime.onMessage.removeListener(messageListener);
+        };
     }, []);
 
     return (
-        <div className="w-full">
-            <h1>SSL and Page Content Scraper</h1>
+        <div className="w-72 mx-auto p-6 bg-gray-100 ">
+            <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">SSL & Page Content Scraper</h1>
+
             
             {/* SSL Data */}
             {sslData ? (
-                <div>
-                    <h2>SSL Information</h2>
-                    <p>Host: {sslData.host}</p>
-                    <p>Status: {sslData.status}</p>
-                    <p>Grade: {sslData.endpoints[0].grade}</p>
+                <div className="mb-6 p-6 border rounded-lg shadow-lg bg-white">
+                    <h2 className="text-2xl font-semibold mb-4 text-indigo-600">SSL Information</h2>
+                    <p className="mb-2"><span className="font-bold">Host:</span> {sslData.host}</p>
+                    <p className="mb-2"><span className="font-bold">Status:</span> {sslData.status}</p>
+                    <p className="mb-2"><span className="font-bold">Grade:</span> {sslData.endpoints[0].grade}</p>
                 </div>
             ) : (
-                <p>Loading SSL data...</p>
+                <p className="text-center text-lg text-gray-500">Loading SSL data...</p>
             )}
 
             {/* Terms and Conditions */}
@@ -83,12 +114,20 @@ function App() {
 
             {/* Page Content */}
             {formData ? (
-                <div>
-                    <h2>Page Content</h2>
-                    <pre>{formData}</pre>
+                <div className="mb-6 p-6 border rounded-lg shadow-lg bg-white">
+                    <h2 className="text-2xl font-semibold mb-4 text-indigo-600">Page Content</h2>
+                    <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">{formData}</pre>
                 </div>
             ) : (
-                <p>Scraping page content...</p>
+                <p className="text-center text-lg text-gray-500">Scraping page content...</p>
+            )}
+
+            {hasCaptcha === null ? (
+                <p className="text-center text-lg text-gray-500">Checking for CAPTCHA...</p>
+            ) : hasCaptcha ? (
+                <p className="mt-6 text-center text-xl text-red-500 font-semibold">CAPTCHA detected on this page.</p>
+            ) : (
+                <p className="mt-6 text-center text-xl text-green-500 font-semibold">No CAPTCHA found on this page.</p>
             )}
         </div>
     );

@@ -2,7 +2,7 @@
 function scrapeFormData() {
   const formData = {};
   document.querySelectorAll('form').forEach(form => {
-      const formInputs = form.querySelectorAll('input, textarea, select');
+      const formInputs = form.querySelectorAll('input, textarea, select,iframe,p,span');
       formInputs.forEach(input => {
           formData[input.name] = input.value;
       });
