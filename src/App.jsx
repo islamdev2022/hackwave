@@ -83,10 +83,10 @@ const lastRadioInput = radioInputs[radioInputs.length - 1];
             )}
 
     {/* Terms and Conditions */}
-    <p className="mb-4">Condition accepted: {radioInputs ? 'true' : 'false'}</p>
+    <p className="mb-4">Terms accepted: {radioInputs ? 'true' : 'false'}</p>
 
     {/* Cloudflare CAPTCHA Check */}
-    <p className="mb-4">Cloudflare CAPTCHA iframe found: {cloudflareCaptchaFound ? 'true' : 'false'}</p>
+    <p className="mb-4"> CAPTCHA  : {cloudflareCaptchaFound ? 'true' : 'false'}</p>
 
     {/* Total Price */}
     <p className="mb-4">Total Price Certified : {totalCertified ? 'True' : 'False'}</p>
