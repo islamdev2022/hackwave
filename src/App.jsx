@@ -20,15 +20,14 @@ function App() {
             }
         });
 
-        // Get the current tab's URL for SSL data
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            const currentUrl = tabs[0].url;
-            const sslCheckUrl = `https://api.ssllabs.com/api/v3/analyze?host=${new URL(currentUrl).hostname}`;
-            fetch(sslCheckUrl)
-                .then((response) => response.json())
-                .then((data) => setSSLData(data))
-                .catch((error) => console.error('Error fetching SSL data:', error));
-        });
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentUrl = tabs[0].url;
+      const sslCheckUrl = `https://api.ssllabs.com/api/v3/analyze?host=${new URL(currentUrl).hostname}`;
+      fetch(sslCheckUrl)
+        .then((response) => response.json())
+        .then((data) => setSSLData(data))
+        .catch((error) => console.error('Error fetching SSL data:', error));
+    });
 
         // Scrape the current page content and check for Cloudflare CAPTCHA iframes
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
