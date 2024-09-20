@@ -60,37 +60,38 @@ function App() {
     }, []);
 
     return (
-        <div className="w-full">
-            <h1>SSL and Page Content Scraper</h1>
-            
-            {/* SSL Data */}
-            {sslData ? (
-                <div>
-                    <h2>SSL Information</h2>
-                    <p>Host: {sslData.host}</p>
-                    <p>Status: {sslData.status}</p>
-                    <p>Grade: {sslData.endpoints[0].grade}</p>
+        <div className="w-72 mx-auto p-6 bg-gray-100 ">
+    <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">SSL and Page Content Scraper</h1>
+
+    {/* SSL Data */}
+    {sslData ? (
+                <div className="mb-6 p-6 border rounded-lg shadow-lg bg-white">
+                    <h2 className="text-2xl font-semibold mb-4 text-indigo-600">SSL Information</h2>
+                    <p className="mb-2"><span className="font-bold">Host:</span> {sslData.host}</p>
+                    <p className="mb-2"><span className="font-bold">Status:</span> {sslData.status}</p>
+                    <p className="mb-2"><span className="font-bold">Grade:</span> {sslData.endpoints[0].grade}</p>
                 </div>
             ) : (
-                <p>Loading SSL data...</p>
+                <p className="text-center text-lg text-gray-500">Loading SSL data...</p>
             )}
 
-            {/* Terms and Conditions */}
-            <p>Condition accepted: {termsAccepted ? 'true' : 'false'}</p>
+    {/* Terms and Conditions */}
+    <p className="mb-4">Condition accepted: {termsAccepted ? 'true' : 'false'}</p>
 
-            {/* Cloudflare CAPTCHA Check */}
-            <p>Cloudflare CAPTCHA iframe found: {cloudflareCaptchaFound ? 'true' : 'false'}</p>
+    {/* Cloudflare CAPTCHA Check */}
+    <p className="mb-4">Cloudflare CAPTCHA iframe found: {cloudflareCaptchaFound ? 'true' : 'false'}</p>
 
-            {/* Page Content */}
-            {formData ? (
-                <div>
-                    <h2>Page Content</h2>
-                    {/* <pre>{formData}</pre> */}
-                </div>
-            ) : (
-                <p>Scraping page content...</p>
-            )}
+    {/* Page Content */}
+    {formData ? (
+        <div className="mb-4">
+            <h2 className="text-xl font-semibold text-indigo-600">Page Content</h2>
+            <pre className="whitespace-pre-wrap bg-gray-50 p-2 rounded">{JSON.stringify(formData, null, 2)}</pre>
         </div>
+    ) : (
+        <p className="text-center text-lg text-gray-500">Scraping page content...</p>
+    )}
+</div>
+
     );
 }
 
