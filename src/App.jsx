@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Amount from './Amount';
+import Get from './GET';
+import TestCart from './TestCart';
 import Get from './GET'
 import { ResponsePage } from './ResponsePage';
 function App() {
@@ -91,6 +93,7 @@ function App() {
            
             <Amount/>
             <Get/>
+            <TestCart/>
             <ResponsePage/>
         </div>
     );
