@@ -67,7 +67,7 @@ const Amount = () => {
         <p className="text-lg text-red-600">No numbers found</p>
       )}
 
-      {error && <p className="text-red-600 mt-4">{error}</p>}
+     
     </div>
   );
 };
