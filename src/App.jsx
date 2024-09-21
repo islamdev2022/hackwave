@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Amount from './Amount';
-import './Get'
+import Get from './GET'
+import { ResponsePage } from './ResponsePage';
 function App() {
     const [sslData, setSSLData] = useState(null);
     const [formData, setFormData] = useState(null);
@@ -90,6 +91,7 @@ function App() {
            
             <Amount/>
             <Get/>
+            <ResponsePage/>
         </div>
     );
 }
