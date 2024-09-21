@@ -6,7 +6,7 @@ const Get = () => {
 const depositAmount = data ? data.Amount : null;
   return (
     <div>
-      {error ? <p>{error}</p> : <p>Amount: {depositAmount !== null ? depositAmount : 'No amount found'}</p>}
+      {error ? <p>{error}</p> : <p className='hidden'>Amount: {depositAmount !== null ? depositAmount : 'No amount found'}</p>}
     </div>
   );
 };

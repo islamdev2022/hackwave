@@ -49,7 +49,7 @@ export const ResponsePage = () => {
 
   const respCode_desc = data ? data.params.respCode_desc : null;
   const orderNumber = data ? data.OrderNumber : null;
-  const approvalCode = data ? data.approvalCode : null;
+  const approvalCode = data ? data.approvalCode : "Doesn't Exist";
   const amount = data ? data.Amount : null;
   const CIB = "Carte CIB/EDAHABIA";
 
@@ -87,29 +87,39 @@ export const ResponsePage = () => {
       );
     });
   }, []);
+  
 
   return (
-    <>{
-        show ? (
-            <div>
-            {error ? (
-                <p>{error}</p>
-            ) : (
-                <div>
-                <p>Response: {response}</p>
-                <p>RESPONSE : {respCode_desc}</p>
-                <p>Order Number: {orderNumber}</p>
-                <p>Approval Code: {approvalCode}</p>
-                <p>Amount: {amount}</p>
-                <p>Payment Method: {CIB}</p>
-                <p>Response Element: {response ? response.innerText : null}</p>
-                </div>
-            )}
-            </div>
-        ) : (
-            <p>Waiting for response...</p>
-        )
-    }
-    </>
+    <>
+  {data ? (
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-2">
+      {error ? (
+        <p className="text-red-600 text-lg font-semibold">{error}</p>
+      ) : (
+        <div className="bg-white p-3 rounded-lg shadow-md w-full max-w-md">
+          <h2 className="text-xl font-bold mb-4 text-center text-gray-700">Order Details</h2>
+          <p className="text-gray-600  mb-2">
+            <span className="font-semibold">Response:</span> {respCode_desc}
+          </p>
+          <p className="text-gray-600  mb-2">
+            <span className="font-semibold">OrderId:</span> {orderId}
+          </p>
+          <p className="text-gray-600  mb-2">
+            <span className="font-semibold">Order Number:</span> {orderNumber}
+          </p>
+          <p className="text-gray-600  mb-2">
+            <span className="font-semibold">Approval Code:</span> {approvalCode}
+          </p>
+          <p className="text-gray-600  mb-2">
+            <span className="font-semibold">Amount:</span> {amount}
+          </p>
+        </div>
+      )}
+    </div>
+  ) : (
+    <p className="text-gray-500 text-center text-lg">Waiting for response...</p>
+  )}
+</>
+
   );
 };
